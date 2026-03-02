@@ -4,7 +4,7 @@ from PIL import Image
 import os
 import math
 
-DATA_DIR = './ddidiversedermatologyimages'
+DATA_DIR = './DDI'
 CSV_FILENAME = 'ddi_metadata.csv' 
 IMAGE_COL = 'DDI_file'            
 LABEL_COL = 'malignant'         
@@ -18,7 +18,7 @@ def visualize_dataset(data_dir, csv_file, img_col, label_col, id_col, num_images
         print(f"NO CSV AT {os.path.abspath(csv_path)}")
         return
 
-    df = pd.read_csv(csv_path)
+    df = pd.read_csv(CSV_FILENAME)
     
     if len(df) > num_images:
         sample_df = df.sample(n=num_images, random_state=42)
