@@ -79,6 +79,7 @@ for epoch in range(NUM_EPOCHS):
 
     for X_batch, y_batch in train_loader:
         train_preds = model(X_batch)
+        y_batch = y_batch.float()
         loss = loss_fn(train_preds, y_batch.unsqueeze(1))
         optimizer.zero_grad()
         loss.backward()
@@ -88,6 +89,7 @@ for epoch in range(NUM_EPOCHS):
 
     for X_batch, y_batch in val_loader:
         val_preds = model(X_batch)
+        y_batch = y_batch.float()
         loss = loss_fn(val_preds, y_batch.unsqueeze(1))
         class_preds = val_preds > 0
         total_val_correct += (class_preds == y_batch.unsqueeze(1)).sum()
@@ -105,6 +107,7 @@ with torch.no_grad():
 
     for X_batch, y_batch in test_loader:
         test_preds = model(X_batch)
+        y_batch = y_batch.float()
         loss = loss_fn(test_preds, y_batch.unsqueeze(1))
         class_preds = test_preds > 0
         total_correct += (class_preds == y_batch.unsqueeze(1)).sum()
