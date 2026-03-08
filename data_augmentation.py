@@ -17,7 +17,8 @@ train_transforms = v2.Compose([
 test_transforms = v2.Compose([
     v2.ToImage(),
     v2.Resize((224, 224), antialias=True),
-    v2.ToDtype(torch.float32, scale=True)
+    v2.ToDtype(torch.float32, scale=True),
+    v2.Normalize(mean=[0.594, 0.478, 0.396], std=[0.207, 0.204, 0.210])
 ])
 
 train_data = ImageFolder(root='train', transform=train_transforms)
