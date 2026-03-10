@@ -78,7 +78,7 @@ for epoch in range(NUM_EPOCHS):
         optimizer.step()
 
     train_loss = total_train_loss / len(train_loader)
-    train_accuracy = total_train_correct / len(train_loader)
+    train_accuracy = total_train_correct / len(train_data)
     print(f"Epoch {epoch} | Training Loss: {train_loss.item()} | Train Accuracy: {train_accuracy}")
 
     total_val_loss = 0
@@ -93,7 +93,7 @@ for epoch in range(NUM_EPOCHS):
         total_val_correct += (class_preds == y_batch.unsqueeze(1)).sum()
 
     val_loss = total_val_loss / len(val_loader)
-    val_accuracy = total_val_correct / len(val_loader)
+    val_accuracy = total_val_correct / len(val_data)
     print(f"Epoch {epoch} | Validation Loss: {val_loss.item()} | Accuracy: {val_accuracy}")
 
 print("\n------------------------Testing Phase-----------------------------\n")
@@ -114,5 +114,5 @@ with torch.no_grad():
         total_correct += (class_preds == y_batch.unsqueeze(1)).sum()
 
     test_loss = total_test_loss / len(test_loader)
-    test_accuracy = total_correct / len(test_loader)
+    test_accuracy = total_correct / len(test_data)
     print(f"Loss: {test_loss.item()} | Accuracy: {test_accuracy}")
