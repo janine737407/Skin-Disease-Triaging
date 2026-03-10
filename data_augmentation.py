@@ -34,8 +34,8 @@ class ConvNet(nn.Module):
     
     def __init__(self):
         super().__init__()
-        self.conv1 = nn.Conv2d(3, 6, 3, 1, 1) # We decided to keep kernel size, stride, and padding the same for all three convolution layers.
-        self.conv2 = nn.Conv2d(6, 16, 3, 1, 1)
+        self.conv1 = nn.Conv2d(3, 10, 3, 1, 1) # We decided to keep kernel size, stride, and padding the same for all three convolution layers.
+        self.conv2 = nn.Conv2d(10, 16, 3, 1, 1)
         self.conv3 = nn.Conv2d(16, 48, 3, 1, 1) # We added another convolution layer to increase the amount of features the model could pick up on.
         self.pool = nn.MaxPool2d(2, 2)
         self.fc1 = nn.Linear(28 * 28 * 48, 400)
