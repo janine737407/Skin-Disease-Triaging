@@ -30,21 +30,6 @@ train_loader = DataLoader(train_data, batch_size=32, shuffle=True)
 val_loader = DataLoader(val_data, batch_size=32, shuffle=False)
 test_loader = DataLoader(test_data, batch_size=32, shuffle=False)
 
-# for X_batch, y_batch in train_loader:
-    # for i in range(len(X_batch)):
-        # print(f"train input: {X_batch[i]}")
-        # print(f"train output: {y_batch[i]}")
-
-# for X_batch, y_batch in val_loader:
-    # for i in range(len(X_batch)):
-        # print(f"validation input: {X_batch[i]}")
-        # print(f"validation output: {y_batch[i]}")
-
-# for X_batch, y_batch in test_loader:
-    # for i in range(len(X_batch)):
-        # print(f"test input: {X_batch[i]}")
-        # print(f"test output: {y_batch[i]}")
-
 class ConvNet(nn.Module):
     
     def __init__(self):
@@ -78,25 +63,38 @@ NUM_EPOCHS = 10
 
 for epoch in range(NUM_EPOCHS):
 
+    total_train_loss = 0
+    total_train_correct = 0
+
     for X_batch, y_batch in train_loader:
         train_preds = model(X_batch)
         y_batch = y_batch.float()
         loss = loss_fn(train_preds, y_batch.unsqueeze(1))
+        total_train_loss += loss
+        class_preds = train_preds > 0
+        total_train_correct += (class_preds == y_batch.unsqueeze(1)).sum()
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
+    train_loss = total_train_loss / len(train_loader)
+    train_accuracy = total_train_correct / len(train_loader)
+    print(f"Epoch {epoch} | Training Loss: {train_loss.item()} | Train Accuracy: {train_accuracy}")
+
+    total_val_loss = 0
     total_val_correct = 0
 
     for X_batch, y_batch in val_loader:
         val_preds = model(X_batch)
         y_batch = y_batch.float()
         loss = loss_fn(val_preds, y_batch.unsqueeze(1))
+        total_val_loss += loss
         class_preds = val_preds > 0
         total_val_correct += (class_preds == y_batch.unsqueeze(1)).sum()
 
-    val_accuracy = total_val_correct / len(val_data)
-    print(f"Epoch {epoch} | Loss: {loss.item()} | Accuracy: {val_accuracy}")
+    val_loss = total_val_loss / len(val_loader)
+    val_accuracy = total_val_correct / len(val_loader)
+    print(f"Epoch {epoch} | Validation Loss: {val_loss.item()} | Accuracy: {val_accuracy}")
 
 print("\n------------------------Testing Phase-----------------------------\n")
 
@@ -105,13 +103,16 @@ model.eval()
 with torch.no_grad():
 
     total_correct = 0
+    total_test_loss = 0
 
     for X_batch, y_batch in test_loader:
         test_preds = model(X_batch)
         y_batch = y_batch.float()
         loss = loss_fn(test_preds, y_batch.unsqueeze(1))
+        total_test_loss += loss
         class_preds = test_preds > 0
         total_correct += (class_preds == y_batch.unsqueeze(1)).sum()
 
-    test_accuracy = total_correct / len(test_data)
-    print(f"Loss: {loss.item()} | Accuracy: {test_accuracy}")
+    test_loss = total_test_loss / len(test_loader)
+    test_accuracy = total_correct / len(test_loader)
+    print(f"Loss: {test_loss.item()} | Accuracy: {test_accuracy}")
