@@ -57,7 +57,7 @@ class ConvNet(nn.Module):
 model = ConvNet()
 model.train()
 
-loss_fn = nn.BCEWithLogitsLoss()
+loss_fn = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([3.0]))
 optimizer = optim.Adam(model.parameters(), lr=0.01)
 NUM_EPOCHS = 10
 
@@ -94,7 +94,7 @@ for epoch in range(NUM_EPOCHS):
 
     val_loss = total_val_loss / len(val_loader)
     val_accuracy = total_val_correct / len(val_data)
-    print(f"Epoch {epoch} | Validation Loss: {val_loss.item()} | Accuracy: {val_accuracy}")
+    print(f"Epoch {epoch} | Validation Loss: {val_loss.item()} | Validation Accuracy: {val_accuracy}")
 
 print("\n------------------------Testing Phase-----------------------------\n")
 
