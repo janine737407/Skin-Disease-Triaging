@@ -64,11 +64,11 @@ class ConvNet(nn.Module):
 model = ConvNet()
 model.train()
 
-loss_fn = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([4.0]))
+loss_fn = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([3.5]))
 optimizer = optim.Adam(model.parameters(), lr=0.001) # lowered learning rate 0.01 -> 0.001
 
-scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1) # Added lr scheduler, drops 10% every 3 epochs
-NUM_EPOCHS = 10
+scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.5) # Added lr scheduler
+NUM_EPOCHS = 20
 THRESHOLD = 0
 
 for epoch in range(NUM_EPOCHS):
