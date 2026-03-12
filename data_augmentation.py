@@ -64,9 +64,10 @@ class ConvNet(nn.Module):
 model = ConvNet()
 model.train()
 
-loss_fn = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([2.0]))
+loss_fn = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([10.0])) # increased pos weight 3.0 -> 10.0
 optimizer = optim.Adam(model.parameters(), lr=0.001) # lowered learning rate 0.01 -> 0.001
 NUM_EPOCHS = 10
+THRESHOLD = -0.84 # lower threshold than 0 for 
 
 for epoch in range(NUM_EPOCHS):
 
@@ -87,8 +88,8 @@ for epoch in range(NUM_EPOCHS):
         loss.backward()
         optimizer.step()
 
-        total_train_loss += loss.item()
-        class_preds = train_preds > 0
+        total_train_loss += loss.item() 
+        class_preds = train_preds > THRESHOLD
         total_train_correct += (class_preds == y_batch).sum().item()
 
         # Calculate true positives, false positives, false negatives
@@ -121,7 +122,7 @@ for epoch in range(NUM_EPOCHS):
             loss = loss_fn(val_preds, y_batch)
 
             total_val_loss += loss
-            class_preds = val_preds > 0
+            class_preds = val_preds > THRESHOLD
             total_val_correct += (class_preds == y_batch).sum().item()
 
             val_tp += ((class_preds == 1) & (y_batch == 1)).sum().item()
@@ -153,7 +154,7 @@ with torch.no_grad():
         loss = loss_fn(test_preds, y_batch)
 
         total_test_loss += loss
-        class_preds = test_preds > 0
+        class_preds = test_preds > THRESHOLD
         total_correct += (class_preds == y_batch).sum().item() # Changed from .unsqueeze to .item
 
         test_tp += ((class_preds == 1) & (y_batch == 1)).sum().item()
