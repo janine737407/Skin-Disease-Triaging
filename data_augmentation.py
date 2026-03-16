@@ -6,6 +6,9 @@ import torch.nn as nn
 import torch.optim as optim
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, precision_score, recall_score
 import matplotlib.pyplot as plt
+import numpy as np
+from torch.utils.data import WeightedRandomSampler
+
 # import os
 
 # print(len(os.listdir('train/malignant')))
@@ -36,56 +39,125 @@ test_data = ImageFolder(root='test', transform=test_transforms)
 
 
 
+# get the labels directly from PyTorch's ImageFolder
+train_labels = train_data.targets
+
+# count how many images are in each class
+class_counts = np.bincount(train_labels)
+print(f"Dataset Class Counts (Benign vs. Malignant): {class_counts}")
+
+# calculate weight for each class
+class_weights = 1.0 / class_counts
+
+# assign correct weight to every single image in the dataset
+sample_weights = [class_weights[label] for label in train_labels]
+
+sampler = WeightedRandomSampler(
+    weights=sample_weights, 
+    num_samples=len(sample_weights), # Draw the same total number of images per epoch
+    replacement=True                
+)
+
 # Batch images to process faster
-train_loader = DataLoader(train_data, batch_size=32, shuffle=True)
+train_loader = DataLoader(train_data, batch_size=32, sampler=sampler)
 val_loader = DataLoader(val_data, batch_size=32, shuffle=False)
 test_loader = DataLoader(test_data, batch_size=32, shuffle=False)
 
-class ConvNet(nn.Module):
+# class ConvNet(nn.Module):
     
+#     def __init__(self):
+#         super().__init__()
+#         self.conv1 = nn.Conv2d(3, 10, 3, 1, 1) # We decided to keep kernel size, stride, and padding the same for all three convolution layers.
+#         self.batchNorm1 = nn.BatchNorm2d(10)
+#         self.conv2 = nn.Conv2d(10, 20, 3, 1, 1)
+#         self.batchNorm2 = nn.BatchNorm2d(20)
+#         self.conv3 = nn.Conv2d(20, 48, 3, 1, 1) # We added another convolution layer to increase the amount of features the model could pick up on.
+#         self.batchNorm3 = nn.BatchNorm2d(48)
+#         self.pool = nn.MaxPool2d(2, 2)
+#         self.dropout = nn.Dropout(p=0.3) # 30% probability dropout
+#         self.fc1 = nn.Linear(28 * 28 * 48, 400)
+#         self.fc2 = nn.Linear(400, 1) # We made two linear layers instead of one because the jump from 37632 to 1 seemed like a lot.
+#         self.relu = nn.ReLU()
+#         # self.sig = nn.Sigmoid()
+
+#     def forward(self, X):
+#         X = self.relu(self.conv1(X))
+#         X = self.batchNorm1(X)
+#         X = self.pool(X)
+#         X = self.relu(self.conv2(X))
+#         X = self.batchNorm2(X)
+#         X = self.pool(X)
+#         X = self.relu(self.conv3(X))
+#         X = self.batchNorm3(X)
+#         X = self.pool(X)
+#         X = X.flatten(start_dim=1)
+#         X = self.dropout(X) # Dropout before fc1
+#         X = self.relu(self.fc1(X))
+#         X = self.dropout(X) # Dropout before fc2
+#         output = self.fc2(X)
+#         # output = self.sig(X)
+#         return output
+    
+# model = ConvNet()
+# model.train()
+
+# # loss_fn = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([2.0]))
+# loss_fn = nn.BCEWithLogitsLoss()
+# optimizer = optim.Adam(model.parameters(), lr=0.001) # lowered learning rate 0.01 -> 0.001
+
+
+class ConvNet(nn.Module):
     def __init__(self):
         super().__init__()
-        self.conv1 = nn.Conv2d(3, 10, 3, 1, 1) # We decided to keep kernel size, stride, and padding the same for all three convolution layers.
-        self.batchNorm1 = nn.BatchNorm2d(10)
-        self.conv2 = nn.Conv2d(10, 20, 3, 1, 1)
-        self.batchNorm2 = nn.BatchNorm2d(20)
-        self.conv3 = nn.Conv2d(20, 48, 3, 1, 1) # We added another convolution layer to increase the amount of features the model could pick up on.
-        self.batchNorm3 = nn.BatchNorm2d(48)
+        self.conv1 = nn.Conv2d(3, 16, 3, 1, 1) 
+        self.batchNorm1 = nn.BatchNorm2d(16)
+        self.conv2 = nn.Conv2d(16, 32, 3, 1, 1)
+        self.batchNorm2 = nn.BatchNorm2d(32)
+        self.conv3 = nn.Conv2d(32, 64, 3, 1, 1) 
+        self.batchNorm3 = nn.BatchNorm2d(64)
+        
         self.pool = nn.MaxPool2d(2, 2)
-        self.dropout = nn.Dropout(p=0.3) # 30% probability dropout
-        self.fc1 = nn.Linear(28 * 28 * 48, 400)
-        self.fc2 = nn.Linear(400, 1) # We made two linear layers instead of one because the jump from 37632 to 1 seemed like a lot.
+        
+        # Global Average Pooling to reduced overfitting
+        self.gap = nn.AdaptiveAvgPool2d((1, 1))
+        
+        # Increased dropout to 50%
+        self.dropout = nn.Dropout(p=0.5) 
+        
+        # 64 inputs to 1 output
+        self.fc1 = nn.Linear(64, 1) 
         self.relu = nn.ReLU()
-        self.sig = nn.Sigmoid()
 
     def forward(self, X):
         X = self.relu(self.conv1(X))
         X = self.batchNorm1(X)
         X = self.pool(X)
+        
         X = self.relu(self.conv2(X))
         X = self.batchNorm2(X)
         X = self.pool(X)
+        
         X = self.relu(self.conv3(X))
         X = self.batchNorm3(X)
         X = self.pool(X)
-        X = X.flatten(start_dim=1)
-        X = self.dropout(X) # Dropout before fc1
-        X = self.relu(self.fc1(X))
-        X = self.dropout(X) # Dropout before fc2
-        X = self.fc2(X)
-        output = self.sig(X)
+        
+        X = self.gap(X)
+        
+        X = X.flatten(start_dim=1) 
+        
+        X = self.dropout(X) 
+        output = self.fc1(X)
         return output
     
 model = ConvNet()
-model.train()
+loss_fn = nn.BCEWithLogitsLoss()
 
-# loss_fn = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([2.0]))
-loss_fn = nn.BCELoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001) # lowered learning rate 0.01 -> 0.001
+# Added weight decay
+optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-3)
 
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.5) # Added lr scheduler
-NUM_EPOCHS = 10
-THRESHOLD = 0.2
+NUM_EPOCHS = 50
+THRESHOLD = 0.5
 
 for epoch in range(NUM_EPOCHS):
 
@@ -107,7 +179,8 @@ for epoch in range(NUM_EPOCHS):
         optimizer.step()
 
         total_train_loss += loss.item() 
-        class_preds = train_preds > THRESHOLD
+        train_probs = torch.sigmoid(train_preds)
+        class_preds = train_probs > THRESHOLD
         total_train_correct += (class_preds == y_batch).sum().item()
 
         # Calculate true positives, false positives, false negatives
@@ -141,7 +214,8 @@ for epoch in range(NUM_EPOCHS):
             loss = loss_fn(val_preds, y_batch)
 
             total_val_loss += loss
-            class_preds = val_preds > THRESHOLD
+            val_probs = torch.sigmoid(val_preds)
+            class_preds = val_probs > THRESHOLD
             total_val_correct += (class_preds == y_batch).sum().item()
 
             val_tp += ((class_preds == 1) & (y_batch == 1)).sum().item()
@@ -159,6 +233,13 @@ for epoch in range(NUM_EPOCHS):
     
     print(f"Epoch {epoch+1} | Val Loss:   {val_loss:.4f} | Accuracy: {val_accuracy:.4f} | Precision: {val_precision:.4f} | Recall: {val_recall:.4f} \n")
     scheduler.step() # Step learning rate
+    if val_precision > 0.4 and val_recall > 0.4:
+        print(f"\n Target reached at Epoch {epoch+1}!")
+        print("Saving model weights...")
+        
+        torch.save(model.state_dict(), 'weights.pt')
+        
+        break
 print("\n--------------------------------Testing Phase-------------------------------------\n")
 
 model.eval()
@@ -177,7 +258,8 @@ with torch.no_grad():
         loss = loss_fn(test_preds, y_batch)
 
         total_test_loss += loss
-        class_preds = test_preds > THRESHOLD
+        test_probs = torch.sigmoid(test_preds)
+        class_preds = test_probs > THRESHOLD
         all_class_preds.append(class_preds.squeeze().tolist())
         test_outputs.append(y_batch.squeeze().tolist()) #JSDGDSIUFGNDIUFNGIUNIFDUNGIDFgFIU
         total_correct += (class_preds == y_batch).sum().item() # Changed from .unsqueeze to .item
