@@ -252,6 +252,7 @@ with torch.no_grad():
     cm = confusion_matrix(test_outputs, all_class_preds)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels= ['Benign', 'Malignant'])
     disp.plot()
+    plt.savefig("confusion_matrix.png")
     plt.show()
 
 
