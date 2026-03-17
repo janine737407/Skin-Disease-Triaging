@@ -115,144 +115,147 @@ class ConvNet(nn.Module):
         output = self.fc1(X) 
         return output
     
-model = ConvNet()
-loss_fn = nn.BCEWithLogitsLoss()
+if __name__ == '__main__':
 
-# Lowered learning rate to 0.0001 so network can converge 
-optimizer = optim.Adam(model.parameters(), lr=0.0001, weight_decay=0.00001)
+    model = ConvNet()
+    loss_fn = nn.BCEWithLogitsLoss()
 
-scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=15, gamma=0.5) # Added lr scheduler
-NUM_EPOCHS = 50
-THRESHOLD = 0.65
+    # Lowered learning rate to 0.0001 so network can converge 
+    optimizer = optim.Adam(model.parameters(), lr=0.0001, weight_decay=0.00001)
 
-for epoch in range(NUM_EPOCHS):
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=15, gamma=0.5) # Added lr scheduler
+    NUM_EPOCHS = 50
+    THRESHOLD = 0.65
 
-    total_train_loss = 0
-    total_train_correct = 0
-    train_tp = 0
-    train_fp = 0
-    train_fn = 0
+    for epoch in range(NUM_EPOCHS):
 
-    model.train() # train mode for dropout
+        total_train_loss = 0
+        total_train_correct = 0
+        train_tp = 0
+        train_fp = 0
+        train_fn = 0
 
-    for X_batch, y_batch in train_loader:
-        train_preds = model(X_batch)
-        y_batch = y_batch.float().unsqueeze(1)
-        loss = loss_fn(train_preds, y_batch)
-        
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+        model.train() # train mode for dropout
 
-        total_train_loss += loss.item() 
-        train_probs = torch.sigmoid(train_preds)
-        class_preds = train_probs > THRESHOLD
-        total_train_correct += (class_preds == y_batch).sum().item()
-
-        # Calculate true positives, false positives, false negatives
-        train_tp += ((class_preds == 1) & (y_batch == 1)).sum().item()
-        train_fp += ((class_preds == 1) & (y_batch == 0)).sum().item()
-        train_fn += ((class_preds == 0) & (y_batch == 1)).sum().item()
-
-    train_loss = total_train_loss / len(train_loader)
-    train_accuracy = total_train_correct / len(train_data)
-
-
-    # Calculate training precision and recall
-    train_precision = train_tp / (train_tp + train_fp) if (train_tp + train_fp) > 0 else 0.0
-    train_recall = train_tp / (train_tp + train_fn) if (train_tp + train_fn) > 0 else 0.0
-
-    print(f"Epoch {epoch+1} | Train Loss: {train_loss:.4f} | Train Accuracy: {train_accuracy:.4f} | Precision: {train_precision:.4f} | Recall: {train_recall:.4f}")
-
-    total_val_loss = 0
-    total_val_correct = 0
-    val_tp = 0
-    val_fp = 0
-    val_fn = 0
-
-    total_malignant = 0
-
-    model.eval() # No dropout for validation
-    with torch.no_grad():
-        for X_batch, y_batch in val_loader:
-            val_preds = model(X_batch)
+        for X_batch, y_batch in train_loader:
+            train_preds = model(X_batch)
             y_batch = y_batch.float().unsqueeze(1)
-            loss = loss_fn(val_preds, y_batch)
-
-            total_val_loss += loss
-            val_probs = torch.sigmoid(val_preds)
-            class_preds = val_probs > THRESHOLD
-            total_val_correct += (class_preds == y_batch).sum().item()
-
-            val_tp += ((class_preds == 1) & (y_batch == 1)).sum().item()
-            val_fp += ((class_preds == 1) & (y_batch == 0)).sum().item()
-            val_fn += ((class_preds == 0) & (y_batch == 1)).sum().item()
-            total_malignant += (class_preds == 1).sum().item()
-
-
-    val_loss = total_val_loss / len(val_loader)
-    val_accuracy = total_val_correct / len(val_data)
-    val_precision = val_tp / (val_tp + val_fp) if (val_tp + val_fp) > 0 else 0.0
-    val_recall = val_tp / (val_tp + val_fn) if (val_tp + val_fn) > 0 else 0.0
-
-    print(f"Malignant preds: {total_malignant}")
-    
-    print(f"Epoch {epoch+1} | Val Loss:   {val_loss:.4f} | Accuracy: {val_accuracy:.4f} | Precision: {val_precision:.4f} | Recall: {val_recall:.4f} \n")
-    scheduler.step() # Step learning rate
-    if val_precision > 0.3 and val_recall > 0.3:
-        print(f"\n Target reached at Epoch {epoch+1}!")
-        print("Saving model weights...")
+            loss = loss_fn(train_preds, y_batch)
         
-        torch.save(model.state_dict(), 'weights.pt')
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            total_train_loss += loss.item() 
+            train_probs = torch.sigmoid(train_preds)
+            class_preds = train_probs > THRESHOLD
+            total_train_correct += (class_preds == y_batch).sum().item()
+
+            # Calculate true positives, false positives, false negatives
+            train_tp += ((class_preds == 1) & (y_batch == 1)).sum().item()
+            train_fp += ((class_preds == 1) & (y_batch == 0)).sum().item()
+            train_fn += ((class_preds == 0) & (y_batch == 1)).sum().item()
+
+        train_loss = total_train_loss / len(train_loader)
+        train_accuracy = total_train_correct / len(train_data)
+
+
+        # Calculate training precision and recall
+        train_precision = train_tp / (train_tp + train_fp) if (train_tp + train_fp) > 0 else 0.0
+        train_recall = train_tp / (train_tp + train_fn) if (train_tp + train_fn) > 0 else 0.0
+
+        print(f"Epoch {epoch+1} | Train Loss: {train_loss:.4f} | Train Accuracy: {train_accuracy:.4f} | Precision: {train_precision:.4f} | Recall: {train_recall:.4f}")
+
+        total_val_loss = 0
+        total_val_correct = 0
+        val_tp = 0
+        val_fp = 0
+        val_fn = 0
+
+        total_malignant = 0
+
+        model.eval() # No dropout for validation
+        with torch.no_grad():
+            for X_batch, y_batch in val_loader:
+                val_preds = model(X_batch)
+                y_batch = y_batch.float().unsqueeze(1)
+                loss = loss_fn(val_preds, y_batch)
+
+                total_val_loss += loss
+                val_probs = torch.sigmoid(val_preds)
+                class_preds = val_probs > THRESHOLD
+                total_val_correct += (class_preds == y_batch).sum().item()
+
+                val_tp += ((class_preds == 1) & (y_batch == 1)).sum().item()
+                val_fp += ((class_preds == 1) & (y_batch == 0)).sum().item()
+                val_fn += ((class_preds == 0) & (y_batch == 1)).sum().item()
+                total_malignant += (class_preds == 1).sum().item()
+
+
+        val_loss = total_val_loss / len(val_loader)
+        val_accuracy = total_val_correct / len(val_data)
+        val_precision = val_tp / (val_tp + val_fp) if (val_tp + val_fp) > 0 else 0.0
+        val_recall = val_tp / (val_tp + val_fn) if (val_tp + val_fn) > 0 else 0.0
+
+        print(f"Malignant preds: {total_malignant}")
+    
+        print(f"Epoch {epoch+1} | Val Loss:   {val_loss:.4f} | Accuracy: {val_accuracy:.4f} | Precision: {val_precision:.4f} | Recall: {val_recall:.4f} \n")
+        scheduler.step() # Step learning rate
+        if val_precision > 0.3 and val_recall > 0.3:
+            print(f"\n Target reached at Epoch {epoch+1}!")
+            print("Saving model weights...")
         
-        break
+            torch.save(model.state_dict(), 'weights.pt')
+        
+            break
 
-torch.save(model.state_dict(), 'final+weights.pt') #Save weights
-print("\n--------------------------------Testing Phase-------------------------------------\n")
+    torch.save(model.state_dict(), 'final+weights.pt') #Save weights
+    print("\n--------------------------------Testing Phase-------------------------------------\n")
 
-model.eval()
+    model.eval()
 
-with torch.no_grad():
+    with torch.no_grad():
 
-    total_correct = 0
-    total_test_loss = 0
+        total_correct = 0
+        total_test_loss = 0
     
-    all_class_preds = [] # for confusion matrix
-    test_outputs = []
+        all_class_preds = [] # for confusion matrix
+        test_outputs = []
 
-    for X_batch, y_batch in test_loader:
-        test_preds = model(X_batch)
-        y_batch = y_batch.float().unsqueeze(1)
-        loss = loss_fn(test_preds, y_batch)
+        for X_batch, y_batch in test_loader:
+            test_preds = model(X_batch)
+            y_batch = y_batch.float().unsqueeze(1)
+            loss = loss_fn(test_preds, y_batch)
 
-        total_test_loss += loss
-        test_probs = torch.sigmoid(test_preds)
-        class_preds = test_probs > THRESHOLD
-        all_class_preds.append(class_preds.squeeze().tolist())
-        test_outputs.append(y_batch.squeeze().tolist()) #JSDGDSIUFGNDIUFNGIUNIFDUNGIDFgFIU
-        total_correct += (class_preds == y_batch).sum().item() # Changed from .unsqueeze to .item
+            total_test_loss += loss
+            test_probs = torch.sigmoid(test_preds)
+            class_preds = test_probs > THRESHOLD
+            all_class_preds.append(class_preds.squeeze().tolist())
+            test_outputs.append(y_batch.squeeze().tolist()) #JSDGDSIUFGNDIUFNGIUNIFDUNGIDFgFIU
+            total_correct += (class_preds == y_batch).sum().item() # Changed from .unsqueeze to .item
 
-    all_class_preds = [pred for batch in all_class_preds for pred in batch]
-    all_class_preds = torch.tensor(all_class_preds)
-    test_outputs = [output for batch in test_outputs for output in batch]
-    test_outputs = torch.tensor(test_outputs)
+        all_class_preds = [pred for batch in all_class_preds for pred in batch]
+        all_class_preds = torch.tensor(all_class_preds)
+        test_outputs = [output for batch in test_outputs for output in batch]
+        test_outputs = torch.tensor(test_outputs)
 
-    test_precision = precision_score(test_outputs, all_class_preds, average=None)
-    test_recall = recall_score(test_outputs, all_class_preds, average=None)
+        test_precision = precision_score(test_outputs, all_class_preds, average=None)
+        test_recall = recall_score(test_outputs, all_class_preds, average=None)
 
-    test_loss = total_test_loss / len(test_loader)
-    test_accuracy = total_correct / len(test_data)
-    
-
-    print(f"Test Loss: {test_loss:.4f} | Accuracy: {test_accuracy:.4f} | Precision: {test_precision} | Recall: {test_recall}")
-
+        test_loss = total_test_loss / len(test_loader)
+        test_accuracy = total_correct / len(test_data)
     
 
+        print(f"Test Loss: {test_loss:.4f} | Accuracy: {test_accuracy:.4f} | Precision: {test_precision} | Recall: {test_recall}")
+
     
-    cm = confusion_matrix(test_outputs, all_class_preds)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels= ['Benign', 'Malignant'])
-    disp.plot()
-    plt.savefig("confusion_matrix.png")
-    plt.show()
+
+    
+    
+        cm = confusion_matrix(test_outputs, all_class_preds)
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels= ['Benign', 'Malignant'])
+        disp.plot()
+        plt.savefig("confusion_matrix.png")
+        plt.show()
 
 
