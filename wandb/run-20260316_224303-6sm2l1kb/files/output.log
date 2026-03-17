@@ -1,0 +1,27 @@
+Epoch 1 | Train Loss: 0.6941 | Train Accuracy: 0.5270 | Precision: 0.5068 | Recall: 0.1754
+Malignant preds: 0
+Epoch 1 | Val Loss:   0.6738 | Accuracy: 0.7385 | Precision: 0.0000 | Recall: 0.0000
+
+Epoch 2 | Train Loss: 0.6307 | Train Accuracy: 0.6216 | Precision: 0.7831 | Recall: 0.3023
+Malignant preds: 1
+Epoch 2 | Val Loss:   0.7420 | Accuracy: 0.7308 | Precision: 0.0000 | Recall: 0.0000
+
+Epoch 3 | Train Loss: 0.6269 | Train Accuracy: 0.6104 | Precision: 0.7547 | Recall: 0.3524
+Malignant preds: 3
+Epoch 3 | Val Loss:   0.7066 | Accuracy: 0.7308 | Precision: 0.3333 | Recall: 0.0294
+
+Epoch 4 | Train Loss: 0.5614 | Train Accuracy: 0.6667 | Precision: 0.7899 | Recall: 0.4332
+Malignant preds: 14
+Epoch 4 | Val Loss:   0.7869 | Accuracy: 0.6923 | Precision: 0.2857 | Recall: 0.1176
+
+Epoch 5 | Train Loss: 0.5519 | Train Accuracy: 0.6644 | Precision: 0.7840 | Recall: 0.4455
+Malignant preds: 31
+Epoch 5 | Val Loss:   0.7970 | Accuracy: 0.6692 | Precision: 0.3548 | Recall: 0.3235
+
+
+ Target reached at Epoch 5!
+Saving model weights...
+
+--------------------------------Testing Phase-------------------------------------
+
+Test Loss: 0.6663 | Accuracy: 0.6617 | Precision: [0.76767677 0.35294118] | Recall: [0.7755102  0.34285714]

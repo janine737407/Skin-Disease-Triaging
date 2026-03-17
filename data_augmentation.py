@@ -8,6 +8,7 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, precision_
 import matplotlib.pyplot as plt
 import numpy as np
 from torch.utils.data import WeightedRandomSampler
+import wandb
 
 # import os
 
@@ -127,6 +128,20 @@ if __name__ == '__main__':
     NUM_EPOCHS = 50
     THRESHOLD = 0.65
 
+
+    wandb.init(
+    project="CMPM17-02Final", 
+    config={
+        "learning_rate": 1e-4,
+        "epochs": NUM_EPOCHS,
+        "batch_size": 32,
+        "architecture": "skin-disease-triaging",
+        "weight_decay": 1e-5,
+        "dropout": 0.2,
+        "threshold": THRESHOLD
+    }
+)
+
     for epoch in range(NUM_EPOCHS):
 
         total_train_loss = 0
@@ -201,13 +216,18 @@ if __name__ == '__main__':
     
         print(f"Epoch {epoch+1} | Val Loss:   {val_loss:.4f} | Accuracy: {val_accuracy:.4f} | Precision: {val_precision:.4f} | Recall: {val_recall:.4f} \n")
         scheduler.step() # Step learning rate
-        if val_precision > 0.3 and val_recall > 0.3:
-            print(f"\n Target reached at Epoch {epoch+1}!")
-            print("Saving model weights...")
-        
-            torch.save(model.state_dict(), 'weights.pt')
-        
-            break
+
+        wandb.log({
+        "Epoch": epoch + 1,
+        "Train Loss": train_loss,
+        "Val Loss": val_loss,
+        "Train Accuracy": train_accuracy,
+        "Val Accuracy": val_accuracy,
+        "Train Precision": train_precision,
+        "Val Precision": val_precision,
+        "Train Recall": train_recall,
+        "Val Recall": val_recall
+    })
 
     torch.save(model.state_dict(), 'final+weights.pt') #Save weights
     print("\n--------------------------------Testing Phase-------------------------------------\n")
@@ -248,7 +268,7 @@ if __name__ == '__main__':
 
         print(f"Test Loss: {test_loss:.4f} | Accuracy: {test_accuracy:.4f} | Precision: {test_precision} | Recall: {test_recall}")
 
-    
+        wandb.finish()
 
     
     

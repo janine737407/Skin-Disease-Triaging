@@ -1,0 +1,69 @@
+_wandb:
+    value:
+        cli_version: 0.25.0
+        e:
+            lx06af8tr9i8b1vfsq1ljp9fvdcqjgat:
+                apple:
+                    ecpuCores: 4
+                    gpuCores: 8
+                    memoryGb: 8
+                    name: Apple M1
+                    pcpuCores: 4
+                    ramTotalBytes: "8589934592"
+                    swapTotalBytes: "5368709120"
+                codePath: data_augmentation.py
+                codePathLocal: data_augmentation.py
+                cpu_count: 8
+                cpu_count_logical: 8
+                disk:
+                    /:
+                        total: "494384795648"
+                        used: "130312413184"
+                email: kchung35@ucsc.edu
+                executable: /usr/local/bin/python3
+                git:
+                    commit: fbf49c82ef014a5becd32d56a8446adbd8f71b03
+                    remote: https://github.com/janine737407/Skin-Disease-Triaging.git
+                host: Kaedons-MacBook-Air.local
+                memory:
+                    total: "8589934592"
+                os: macOS-13.3.1-arm64-arm-64bit
+                program: /Users/kaedonchung/Downloads/CMPM17-Final/Skin-Disease-Triaging/data_augmentation.py
+                python: CPython 3.11.6
+                root: /Users/kaedonchung/Downloads/CMPM17-Final/Skin-Disease-Triaging
+                startedAt: "2026-03-17T05:46:06.327525Z"
+                writerId: lx06af8tr9i8b1vfsq1ljp9fvdcqjgat
+        m: []
+        python_version: 3.11.6
+        t:
+            "1":
+                - 1
+                - 5
+                - 41
+                - 53
+            "2":
+                - 1
+                - 5
+                - 41
+                - 53
+            "3":
+                - 2
+                - 16
+            "4": 3.11.6
+            "5": 0.25.0
+            "12": 0.25.0
+            "13": darwin-arm64
+architecture:
+    value: skin-disease-triaging
+batch_size:
+    value: 32
+dropout:
+    value: 0.2
+epochs:
+    value: 50
+learning_rate:
+    value: 0.0001
+threshold:
+    value: 0.65
+weight_decay:
+    value: 1e-05

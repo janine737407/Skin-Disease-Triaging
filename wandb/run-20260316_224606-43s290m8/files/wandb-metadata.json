@@ -1,0 +1,37 @@
+{
+  "os": "macOS-13.3.1-arm64-arm-64bit",
+  "python": "CPython 3.11.6",
+  "startedAt": "2026-03-17T05:46:06.327525Z",
+  "program": "/Users/kaedonchung/Downloads/CMPM17-Final/Skin-Disease-Triaging/data_augmentation.py",
+  "codePath": "data_augmentation.py",
+  "codePathLocal": "data_augmentation.py",
+  "git": {
+    "remote": "https://github.com/janine737407/Skin-Disease-Triaging.git",
+    "commit": "fbf49c82ef014a5becd32d56a8446adbd8f71b03"
+  },
+  "email": "kchung35@ucsc.edu",
+  "root": "/Users/kaedonchung/Downloads/CMPM17-Final/Skin-Disease-Triaging",
+  "host": "Kaedons-MacBook-Air.local",
+  "executable": "/usr/local/bin/python3",
+  "cpu_count": 8,
+  "cpu_count_logical": 8,
+  "disk": {
+    "/": {
+      "total": "494384795648",
+      "used": "130312413184"
+    }
+  },
+  "memory": {
+    "total": "8589934592"
+  },
+  "apple": {
+    "name": "Apple M1",
+    "ecpuCores": 4,
+    "pcpuCores": 4,
+    "gpuCores": 8,
+    "memoryGb": 8,
+    "swapTotalBytes": "5368709120",
+    "ramTotalBytes": "8589934592"
+  },
+  "writerId": "lx06af8tr9i8b1vfsq1ljp9fvdcqjgat"
+}

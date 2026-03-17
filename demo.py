@@ -1,10 +1,11 @@
 import torch
 from PIL import Image
 from torchvision.transforms import v2
+
 from data_augmentation import ConvNet
 
 model = ConvNet()
-model.load_state_dict(torch.load("final+weights.pt", weights_only=True))
+model.load_state_dict(torch.load("weights.pt", weights_only=True))
 model.eval()
 
 transforms = v2.Compose([
@@ -15,14 +16,27 @@ transforms = v2.Compose([
 ])
 
 # Kaedon can you find a picture that the model predicts correctly and add it to the repo, then change "image.png" to the name
-img = Image.open("image.png").convert('RGB')
+img = Image.open("melanoma.png").convert('RGB')
 img = transforms(img)
 
-# THE BELOW LINES WERE COPIED DIRECTLY FROM ANTHONY'S DEMO.PY BECAUSE I COULDN'T DO IT W/O AN IMAGE
-# print(img.shape) # check image shape is correct, if it isn't, unsqueeze
 img = torch.unsqueeze(img, 0)
 
-pred = model(img)
-print(pred.item())
-# If you are doing classification, use Softmax to turn the output into percentages (see Week 4 Day 2 activity document).
-# Also, try to convert the raw number output into understandable classes.
+
+THRESHOLD = 0.6 
+
+with torch.no_grad():
+    raw_logit = model(img)
+    
+    #Sigmoid for binary classification
+    probability = torch.sigmoid(raw_logit).item()
+    
+    #Convert the raw number output into understandable classes
+    if probability > THRESHOLD:
+        prediction_class = "Malignant"
+    else:
+        prediction_class = "Benign"
+
+    print("------- Model Results -------")
+    print(f"Raw Logit Output: {raw_logit.item():.4f}")
+    print(f"Malignant Probability: {probability * 100:.2f}%")
+    print(f"Final Prediction: {prediction_class}")

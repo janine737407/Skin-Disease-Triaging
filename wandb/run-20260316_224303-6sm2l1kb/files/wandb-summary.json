@@ -1,0 +1,1 @@
+{"Val Accuracy":0.6692307692307692,"Train Recall":0.44545454545454544,"_wandb":{"runtime":72},"_runtime":72,"Val Recall":0.3235294117647059,"Train Accuracy":0.6644144144144144,"_step":4,"Epoch":5,"Val Precision":0.3548387096774194,"Val Loss":0.7969866991043091,"Train Precision":0.784,"Train Loss":0.5518595853022167,"_timestamp":1.773726255673614e+09}
