@@ -15,7 +15,7 @@ transforms = v2.Compose([
 ])
 
 # Kaedon can you find a picture that the model predicts correctly and add it to the repo, then change "image.png" to the name
-img = Image.open("image.png").convert('RGB')
+img = Image.open("melanoma.png").convert('RGB')
 img = transforms(img)
 
 # THE BELOW LINES WERE COPIED DIRECTLY FROM ANTHONY'S DEMO.PY BECAUSE I COULDN'T DO IT W/O AN IMAGE
