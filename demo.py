@@ -15,10 +15,10 @@ transforms = v2.Compose([
     v2.Normalize(mean=[0.594, 0.478, 0.396], std=[0.207, 0.204, 0.210])
 ])
 
-# Kaedon can you find a picture that the model predicts correctly and add it to the repo, then change "image.png" to the name
 img = Image.open("melanoma.png").convert('RGB')
 img = transforms(img)
 
+# print(img.shape) # check image shape is correct, if it isn't, unsqueeze
 img = torch.unsqueeze(img, 0)
 
 
